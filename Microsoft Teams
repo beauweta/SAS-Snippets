@@ -1,0 +1,25 @@
+/* Write from SAS to Microsoft Teams */
+/* See https://blogs.sas.com/content/sasdummy/2019/09/05/sas-microsoft-teams/ */
+
+filename JSON temp; 
+options parmcards=JSON;
+parmcards;
+{"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "summary": "Test message from SAS",
+  "text": "This is a test. This message was sent from WNZL's SAS server."
+}
+;
+
+*options noquotelenmax;
+filename RESP temp;
+proc http
+  /* Webhook connectors for "General" channel in "Data Intelligence" team */
+  url   ="https://outlook.office.com/webhook/15fb22e9-a795-4224-9911-47ef50cfb049@e3d7352c-397e-4fdb-ac22-c9513142fc13/IncomingWebhook/6c841fa4dc66491aa2fa2298cddbd679/96fac466-bfab-467b-9530-1be460b56676"
+  method="POST"
+  in    =JSON
+  out   =RESP;
+run;   
+
+data _null_; infile RESP; input; put _infile_; run;
